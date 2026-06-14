@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Sitemap: https://sujingchengyiyao.site/sitemap.xml
+
+User-agent: Baiduspider
+Allow: /
+Disallow: /research/
+Crawl-delay: 1
