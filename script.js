@@ -7,6 +7,101 @@
 // --- 统一登录凭证 ---
 var CREDENTIALS = { user: 'sujingcheng', pass: '111' };
 
+// ===========================================================
+// 实时股价更新（腾讯财经免费API，无CORS限制）
+// ===========================================================
+(function() {
+    function toApiCode(code) {
+        if (!code) return '';
+        if (code.endsWith('.SZ')) return 'sz' + code.replace('.SZ', '');
+        if (code.endsWith('.SH')) return 'sh' + code.replace('.SH', '');
+        return code;
+    }
+
+    function parseStockLine(varName) {
+        var raw = window[varName];
+        if (!raw || typeof raw !== 'string') return null;
+        var fields = raw.split('~');
+        var price = parseFloat(fields[3]);
+        var changePct = parseFloat(fields[5]);
+        if (isNaN(price) || price <= 0) return null;
+        return { price: price, changePct: changePct };
+    }
+
+    function updateRow(apiCode, origCode) {
+        var data = parseStockLine('v_' + apiCode);
+        if (!data) return;
+        var row = document.querySelector('#portfolio tbody tr[data-code="' + origCode + '"]');
+        if (!row) return;
+        var priceEl = row.querySelector('.rt-price');
+        var changeEl = row.querySelector('.rt-change');
+        var color = data.changePct >= 0 ? '#e74c3c' : '#27ae60';
+        var sign = data.changePct >= 0 ? '+' : '';
+        if (priceEl) {
+            priceEl.textContent = '¥' + data.price.toFixed(2);
+            priceEl.style.color = color;
+        }
+        if (changeEl) {
+            changeEl.textContent = sign + data.changePct.toFixed(2) + '%';
+            changeEl.style.color = color;
+        }
+    }
+
+    function updateStockpick() {
+        var data = parseStockLine('v_sh688621');
+        if (!data) return;
+        var priceEl = document.getElementById('stockpick-price');
+        var changeEl = document.getElementById('stockpick-change');
+        var color = data.changePct >= 0 ? '#e74c3c' : '#27ae60';
+        var sign = data.changePct >= 0 ? '+' : '';
+        if (priceEl) {
+            priceEl.textContent = '¥' + data.price.toFixed(2);
+            priceEl.style.color = color;
+        }
+        if (changeEl) {
+            changeEl.textContent = sign + data.changePct.toFixed(2) + '%';
+            changeEl.style.color = color;
+        }
+    }
+
+    window.fetchStockPrices = function() {
+        var codeList = [];
+        var codeMap = {};
+        document.querySelectorAll('#portfolio tbody tr[data-code]').forEach(function(row) {
+            var origCode = row.getAttribute('data-code');
+            var apiCode = toApiCode(origCode);
+            codeList.push(apiCode);
+            codeMap[apiCode] = origCode;
+        });
+        if (document.getElementById('stockpick-price')) {
+            codeList.push('sh688621');
+        }
+        if (codeList.length === 0) return;
+
+        var oldScript = document.getElementById('stock-fetch-script');
+        if (oldScript) oldScript.remove();
+
+        var script = document.createElement('script');
+        script.id = 'stock-fetch-script';
+        script.src = 'https://qt.gtimg.cn/q=' + codeList.join(',');
+
+        script.onload = function() {
+            Object.keys(codeMap).forEach(function(apiCode) {
+                updateRow(apiCode, codeMap[apiCode]);
+            });
+            updateStockpick();
+            var s = document.getElementById('stock-fetch-script');
+            if (s) s.remove();
+        };
+        script.onerror = function() {
+            console.warn('股价接口请求失败');
+            var s = document.getElementById('stock-fetch-script');
+            if (s) s.remove();
+        };
+        document.head.appendChild(script);
+    };
+})();
+
 // --- 调研专区登录 ---
 function checkResearchLogin() {
     var loggedIn = sessionStorage.getItem('research_logged_in') === 'true';
@@ -143,4 +238,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('backToTop').addEventListener('click', function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    // 实时股价更新：立即拉取 + 每5分钟刷新
+    if (window.fetchStockPrices) {
+        window.fetchStockPrices();
+        setInterval(window.fetchStockPrices, 5 * 60 * 1000);
+    }
 });
