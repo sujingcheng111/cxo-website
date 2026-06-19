@@ -23,9 +23,10 @@ var CREDENTIALS = { user: 'sujingcheng', pass: '111' };
         if (!raw || typeof raw !== 'string') return null;
         var fields = raw.split('~');
         var price = parseFloat(fields[3]);
-        var changePct = parseFloat(fields[5]);
+        var change = parseFloat(fields[31]);   // 涨跌额
+        var changePct = parseFloat(fields[32]); // 涨跌幅%
         if (isNaN(price) || price <= 0) return null;
-        return { price: price, changePct: changePct };
+        return { price: price, change: change, changePct: changePct };
     }
 
     function updateRow(apiCode, origCode) {
