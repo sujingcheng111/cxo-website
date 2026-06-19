@@ -1,12 +1,13 @@
 // ============================================================
 // 东北证券药品团队官网 - 交互脚本
-// 仅保留：调研登录 + 导航 + 回到顶部
+// 仅保留：调研登录 + 底稿登录 + 导航 + 回到顶部
 // 估值专区已移除（2026-06-14）
 // ============================================================
 
-// --- 调研专区登录 ---
-var RESEARCH_CREDENTIALS = { user: 'sujingcheng', pass: '111' };
+// --- 统一登录凭证 ---
+var CREDENTIALS = { user: 'sujingcheng', pass: '111' };
 
+// --- 调研专区登录 ---
 function checkResearchLogin() {
     var loggedIn = sessionStorage.getItem('research_logged_in') === 'true';
     var overlay = document.getElementById('researchLoginOverlay');
@@ -33,7 +34,7 @@ function handleResearchLogin() {
         errEl.textContent = '请输入账号和密码';
         return;
     }
-    if (user !== RESEARCH_CREDENTIALS.user || pass !== RESEARCH_CREDENTIALS.pass) {
+    if (user !== CREDENTIALS.user || pass !== CREDENTIALS.pass) {
         errEl.textContent = '账号或密码错误，请重试';
         return;
     }
@@ -49,6 +50,49 @@ function handleResearchLogout() {
     document.getElementById('researchPass').value = '';
 }
 
+// --- 底稿专区登录 ---
+function checkArchiveLogin() {
+    var loggedIn = sessionStorage.getItem('archive_logged_in') === 'true';
+    var overlay = document.getElementById('archiveLoginOverlay');
+    var content = document.getElementById('archiveContent');
+    var logoutDiv = document.getElementById('archiveLogout');
+
+    if (loggedIn) {
+        overlay.style.display = 'none';
+        content.style.display = 'block';
+        logoutDiv.style.display = 'block';
+    } else {
+        overlay.style.display = 'block';
+        content.style.display = 'none';
+        logoutDiv.style.display = 'none';
+    }
+}
+
+function handleArchiveLogin() {
+    var user = document.getElementById('archiveUser').value.trim();
+    var pass = document.getElementById('archivePass').value.trim();
+    var errEl = document.getElementById('archiveLoginError');
+
+    if (!user || !pass) {
+        errEl.textContent = '请输入账号和密码';
+        return;
+    }
+    if (user !== CREDENTIALS.user || pass !== CREDENTIALS.pass) {
+        errEl.textContent = '账号或密码错误，请重试';
+        return;
+    }
+    sessionStorage.setItem('archive_logged_in', 'true');
+    errEl.textContent = '';
+    checkArchiveLogin();
+}
+
+function handleArchiveLogout() {
+    sessionStorage.removeItem('archive_logged_in');
+    checkArchiveLogin();
+    document.getElementById('archiveUser').value = '';
+    document.getElementById('archivePass').value = '';
+}
+
 // --- 初始化 ---
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -59,6 +103,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Enter') handleResearchLogin();
     });
     document.getElementById('researchLogoutBtn').addEventListener('click', handleResearchLogout);
+
+    // 底稿专区登录
+    checkArchiveLogin();
+    document.getElementById('archiveLoginBtn').addEventListener('click', handleArchiveLogin);
+    document.getElementById('archivePass').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') handleArchiveLogin();
+    });
+    document.getElementById('archiveLogoutBtn').addEventListener('click', handleArchiveLogout);
 
     // 导航平滑滚动
     document.querySelectorAll('.nav-link').forEach(function(link) {
