@@ -608,7 +608,28 @@
         <section id="archive" class="section archive-section">
             <h2 class="section-title"><span class="title-num">08</span>底稿专区</h2>
             <p class="section-desc">研究报告底稿、数据源、调研纪要等内部资料</p>
-            <div class="archive-list">
+            <!-- 登录遮罩 -->
+            <div id="archiveLoginOverlay" class="research-login-overlay">
+                <div class="research-login-box">
+                    <div class="login-icon">🔒</div>
+                    <h3>底稿专区 - 登录访问</h3>
+                    <p class="login-hint">请输入账号密码查看底稿资料</p>
+                    <div class="login-form">
+                        <div class="login-field">
+                            <label>账号</label>
+                            <input type="text" id="archiveUser" placeholder="请输入账号" autocomplete="username">
+                        </div>
+                        <div class="login-field">
+                            <label>密码</label>
+                            <input type="password" id="archivePass" placeholder="请输入密码" autocomplete="current-password">
+                        </div>
+                        <p id="archiveLoginError" class="login-error"></p>
+                        <button id="archiveLoginBtn" class="login-btn">登 录</button>
+                    </div>
+                </div>
+            </div>
+            <!-- 底稿内容（登录后显示） -->
+            <div id="archiveContent" class="archive-list" style="display:none;">
                 <a class="archive-item" href="#"><span class="archive-icon">📗</span><div class="archive-text"><div class="archive-name">凯莱英财务模型（含三表）v2026Q1.xlsx</div><div class="archive-meta">含收入拆分、利润表、资产负债表、现金流 | 更新于 2026-04-30 | 2.8MB</div></div><span class="arrow-icon">→</span></a>
                 <a class="archive-item" href="#"><span class="archive-icon">📗</span><div class="archive-text"><div class="archive-name">康龙化成业务分拆模型 v2026.xlsx</div><div class="archive-meta">小分子CDMO+大分子+临床CRO分板块预测 | 更新于 2026-03-25 | 1.5MB</div></div><span class="arrow-icon">→</span></a>
                 <a class="archive-item" href="#"><span class="archive-icon">📘</span><div class="archive-text"><div class="archive-name">CXO行业季度跟踪报告 Q1 2026.pptx</div><div class="archive-meta">行业规模、竞争格局、核心标的估值对比 | 更新于 2026-04-10 | 6.2MB</div></div><span class="arrow-icon">→</span></a>
@@ -621,6 +642,10 @@
                 <a class="archive-item" href="#"><span class="archive-icon">📗</span><div class="archive-text"><div class="archive-name">集采中标结果汇总（第1-11批）.xlsx</div><div class="archive-meta">历批品种、降幅、中标企业全数据 | 更新于 2026-05-10 | 680KB</div></div><span class="arrow-icon">→</span></a>
                 <a class="archive-item" href="#"><span class="archive-icon">📘</span><div class="archive-text"><div class="archive-name">2026 ASCO国产新药数据汇总.pptx</div><div class="archive-meta">95项中国研究，核心品种关键数据对比 | 更新于 2026-06-02 | 7.8MB</div></div><span class="arrow-icon">→</span></a>
                 <a class="archive-item" href="#"><span class="archive-icon">📙</span><div class="archive-text"><div class="archive-name">ADC药物赛道竞争格局分析.docx</div><div class="archive-meta">全球40+ADC管线、靶点分布、HER2/TROP2/CLDN18.2 | 更新于 2026-05-20 | 2.3MB</div></div><span class="arrow-icon">→</span></a>
+            </div>
+            <!-- 登出按钮 -->
+            <div id="archiveLogout" style="display:none;text-align:right;margin-bottom:12px;margin-top:12px;">
+                <button id="archiveLogoutBtn" class="logout-btn">退出登录</button>
             </div>
         </section>
 
